@@ -369,6 +369,37 @@ function showResult(){
     bd.appendChild(div);
   });
   showScreen('screen-result');
+  registrarResultado(correct, xpTotal, answers);
+}
+
+// ── Registro en Google Sheets ─────────────────────────────────────────────
+function registrarResultado(correct, xpTotal, answers){
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyZhMqz1da9watkSVtkMbp7zrf9S8MvY86AWDFtc39SIbxY4BfV1z2rWtC7sT1YRCFD/exec';
+  const now   = new Date();
+  const fecha = now.toLocaleDateString('es-CL');
+  const hora  = now.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
+  const modulos_usados = [...new Set(answers.map(a=>a.q.modulo_id))].join('+');
+  const payload = {
+    fecha, hora,
+    correctas:  correct,
+    total:      3,
+    porcentaje: Math.round((correct/3)*100)+'%',
+    xp:         xpTotal,
+    modulo:     modulos_usados,
+    dificultad: selectedDiff,
+    q1_id:      answers[0]?.q.id        || '',
+    q1_correcta:answers[0]?.correct ? 'SI' : (answers[0]?.timedOut ? 'TIEMPO' : 'NO'),
+    q2_id:      answers[1]?.q.id        || '',
+    q2_correcta:answers[1]?.correct ? 'SI' : (answers[1]?.timedOut ? 'TIEMPO' : 'NO'),
+    q3_id:      answers[2]?.q.id        || '',
+    q3_correcta:answers[2]?.correct ? 'SI' : (answers[2]?.timedOut ? 'TIEMPO' : 'NO'),
+  };
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(()=>{}); // silencioso si no hay internet
 }
 
 function restartSameConfig(){startQuiz();}
