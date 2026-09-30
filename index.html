@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cami al Volante — Práctica Licencia Clase B</title>
+<title>Cami al Volante — Práctica Licenc Clase B</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -95,6 +95,14 @@
   .btn-row { display:flex; gap:12px; }
   .btn-secondary { flex:1; background:var(--surface2); border:1.5px solid var(--border); border-radius:12px; color:var(--text); font-size:14px; font-weight:600; padding:14px; cursor:pointer; transition:all .2s; }
   .btn-secondary:hover { border-color:var(--accent2); color:var(--accent2); }
+  .exam-countdown { display:flex; align-items:center; justify-content:center; gap:16px; background:linear-gradient(135deg,#eef2ff,#e0e7ff); border:1.5px solid #c7d2fe; border-radius:14px; padding:16px 24px; margin-bottom:28px; }
+  .countdown-days { font-size:52px; font-weight:800; line-height:1; color:#4f46e5; min-width:60px; text-align:center; }
+  .countdown-label { font-size:14px; font-weight:600; color:#3730a3; line-height:1.5; }
+  .countdown-label .countdown-date { font-size:11px; font-weight:400; color:#6366f1; display:block; margin-top:2px; }
+  .exam-countdown.urgent { background:linear-gradient(135deg,#fff1f2,#ffe4e6); border-color:#fecdd3; }
+  .exam-countdown.urgent .countdown-days { color:#dc2626; }
+  .exam-countdown.urgent .countdown-label { color:#991b1b; }
+  .exam-countdown.urgent .countdown-date { color:#dc2626; }
   @media(max-width:500px){.card{padding:24px 20px}.module-grid{grid-template-columns:1fr}.welcome-title{font-size:22px}.score-big{font-size:56px}.btn-row{flex-direction:column}}
 </style>
 </head>
@@ -107,6 +115,10 @@
       <div class="welcome-emoji">🚗</div>
       <h1 class="welcome-title">Cami al Volante</h1>
       <p class="welcome-sub">Práctica de Licencia Clase B · Chile<br>3 preguntas seleccionadas especialmente para ti, Cami.</p>
+      <div class="exam-countdown" id="exam-countdown">
+        <div class="countdown-days" id="countdown-days">--</div>
+        <div class="countdown-label">días para tu examen<br><span class="countdown-date">17 de noviembre 2026</span></div>
+      </div>
       <p class="section-title">Elige un módulo (opcional)</p>
       <div class="module-grid" id="module-grid"></div>
       <p class="section-title">Dificultad</p>
@@ -188,6 +200,25 @@ let selectedModuleId=null,selectedDiff='all',quizQuestions=[],currentIdx=0,answe
     btn.innerHTML='<span class="mod-id">Módulo '+m.id+'</span>'+escHtml(m.nombre);
     btn.onclick=()=>selectModule(btn); grid.appendChild(btn);
   });
+  // Contador días para el examen
+  (function countdown(){
+    const exam = new Date('2026-11-17T00:00:00');
+    const now  = new Date();
+    now.setHours(0,0,0,0);
+    const diff = Math.ceil((exam - now) / 86400000);
+    const box  = document.getElementById('exam-countdown');
+    const num  = document.getElementById('countdown-days');
+    if(diff > 0){
+      num.textContent = diff;
+      if(diff <= 7) box.classList.add('urgent');
+    } else if(diff === 0){
+      num.textContent = '¡Hoy!';
+      box.classList.add('urgent');
+    } else {
+      num.textContent = '🎉';
+      document.querySelector('.countdown-label').innerHTML = '¡Ya rendiste tu examen!<span class="countdown-date">17 de noviembre 2026</span>';
+    }
+  })();
 })();
 
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
